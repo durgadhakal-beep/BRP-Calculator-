@@ -50,7 +50,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Formula Cards */
     .formulas {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -85,7 +84,6 @@
       margin-top: 0.5rem;
     }
 
-    /* Parameter Grid */
     .section-heading {
       font-size: 1.1rem;
       font-weight: 700;
@@ -128,7 +126,6 @@
       outline-offset: 1px;
     }
 
-    /* KPI Summary Strip */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -159,7 +156,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Chart Area */
     .chart-box {
       border: 1.5px solid var(--fg);
       padding: 1.25rem;
@@ -191,14 +187,14 @@
     .line-solid {
       width: 22px;
       height: 2px;
-      background: #000;
+      background: #000000;
       display: inline-block;
     }
 
     .line-dashed {
       width: 22px;
       height: 0;
-      border-top: 2px dashed #000;
+      border-top: 2px dashed #000000;
       display: inline-block;
     }
 
@@ -208,7 +204,6 @@
       display: block;
     }
 
-    /* Button & Table */
     .actions {
       margin-bottom: 1.25rem;
     }
@@ -222,7 +217,6 @@
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.02em;
-      transition: background 0.15s, color 0.15s;
     }
 
     button:hover {
@@ -288,8 +282,7 @@
       <p class="subtitle">Signalized Urban Corridor Travel Time &amp; Delay Modeling Tool</p>
     </header>
 
-    <!-- Cited Formula Reference Boxes -->
-    <section class="formulas" aria-label="Mathematical Formulations">
+    <section class="formulas">
       <div class="formula-box">
         <div class="formula-title">1. Signalized Approach Capacity Sub-Formula</div>
         <div class="formula-math">c = s &times; N &times; (g / C)</div>
@@ -306,9 +299,8 @@
       </div>
     </section>
 
-    <!-- Manual Input Controls -->
     <h2 class="section-heading">Corridor &amp; Signal Parameters (Manual Entry)</h2>
-    <section class="input-grid" aria-label="Parameter Inputs">
+    <section class="input-grid">
       <div class="field">
         <label for="length">Distance L (km)</label>
         <input type="number" id="length" value="0.60" step="0.05" min="0.05" />
@@ -347,9 +339,8 @@
       </div>
     </section>
 
-    <!-- Calculated Results -->
     <h2 class="section-heading">Computed Corridor Performance</h2>
-    <section class="kpi-grid" aria-label="Calculated Outputs">
+    <section class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Free-Flow Time (t<sub>0</sub>)</div>
         <div class="kpi-value" id="outT0">0.90 min</div>
@@ -372,9 +363,23 @@
       </div>
     </section>
 
-    <!-- Monochrome Sensitivity Graph -->
-    <section class="chart-box" aria-label="Sensitivity Graph">
+    <section class="chart-box">
       <div class="chart-header">
         <h2 class="section-heading" style="margin-bottom:0;">Delay Sensitivity vs. Traffic Volume (v)</h2>
         <div class="legend">
           <span class="legend-item"><span class="line-solid"></span> Selected &alpha;</span>
+          <span class="legend-item"><span class="line-dashed"></span> Urban Reference (&alpha; = 1.0)</span>
+        </div>
+      </div>
+      <canvas id="sensitivityChart"></canvas>
+    </section>
+
+    <div class="actions">
+      <button type="button" id="toggleTableBtn">Show Sensitivity Analysis Table</button>
+    </div>
+
+    <div class="table-wrapper" id="tableWrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Active Lanes (N)</th>
