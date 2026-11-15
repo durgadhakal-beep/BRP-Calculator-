@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Junction A to Junction B — BPR Delay Sensitivity Calculator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --gray-light: #f4f4f4;
+      --gray-mid: #cccccc;
+      --gray-dark: #444444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 2px solid var(--fg);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--gray-dark);
+      margin-top: 0.25rem;
+    }
+
+    /* Formula Cards */
+    .formulas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .formula-box {
+      border: 1.5px solid var(--fg);
+      padding: 1rem 1.25rem;
+      background: var(--gray-light);
+    }
+
+    .formula-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .formula-math {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin: 0.35rem 0;
+    }
+
+    .formula-cite {
+      font-size: 0.78rem;
+      color: var(--gray-dark);
+      margin-top: 0.5rem;
+    }
+
+    /* Parameter Grid */
+    .section-heading {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      border: 1.5px solid var(--fg);
+      padding: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    input {
+      border: 1.5px solid var(--fg);
+      background: var(--bg);
+      color: var(--fg);
+      padding: 0.5rem 0.65rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+
+    /* KPI Summary Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .kpi-card {
+      border: 1.5px solid var(--fg);
+      padding: 0.9rem 1rem;
+      text-align: center;
+    }
+
+    .kpi-card.highlight {
+      background: var(--fg);
+      color: var(--bg);
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+
+    /* Chart Area */
+    .chart-box {
+      border: 1.5px solid var(--fg);
+      padding: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .line-solid {
+      width: 22px;
+      height: 2px;
+      background: #000;
+      display: inline-block;
+    }
+
+    .line-dashed {
+      width: 22px;
+      height: 0;
+      border-top: 2px dashed #000;
+      display: inline-block;
+    }
+
+    canvas {
+      width: 100%;
+      height: 300px;
+      display: block;
+    }
+
+    /* Button & Table */
+    .actions {
+      margin-bottom: 1.25rem;
+    }
+
+    button {
+      background: var(--fg);
+      color: var(--bg);
+      border: 2px solid var(--fg);
+      padding: 0.7rem 1.35rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    button:hover {
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    .table-wrapper {
+      display: none;
+      overflow-x: auto;
+      border: 1.5px solid var(--fg);
+      margin-bottom: 2rem;
+    }
+
+    .table-wrapper.visible {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 0.65rem 0.9rem;
+      border-bottom: 1px solid var(--fg);
+      border-right: 1px solid var(--gray-mid);
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+
+    th {
+      background: var(--fg);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background: var(--gray-light);
+    }
+
+    tr.active-row {
+      font-weight: 700;
+      outline: 2px solid var(--fg);
+    }
+
+    footer {
+      border-top: 1px solid var(--gray-mid);
+      padding-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--gray-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Junction A to Junction B: BPR Delay Sensitivity Calculator</h1>
+      <p class="subtitle">Signalized Urban Corridor Travel Time &amp; Delay Modeling Tool</p>
+    </header>
+
+    <!-- Cited Formula Reference Boxes -->
+    <section class="formulas" aria-label="Mathematical Formulations">
+      <div class="formula-box">
+        <div class="formula-title">1. Signalized Approach Capacity Sub-Formula</div>
+        <div class="formula-math">c = s &times; N &times; (g / C)</div>
+        <p class="formula-cite">
+          <strong>Citation:</strong> Transportation Research Board. (2022). <em>Highway Capacity Manual: A Guide for Multimodal Mobility Analysis</em> (7th ed.). National Academies of Sciences, Engineering, and Medicine.
+        </p>
+      </div>
+      <div class="formula-box">
+        <div class="formula-title">2. Congested Travel Time &amp; Delay Formula</div>
+        <div class="formula-math">t = t<sub>0</sub> [ 1 + &alpha; (v / c)<sup>&beta;</sup> ] &nbsp;|&nbsp; d = t &minus; t<sub>0</sub></div>
+        <p class="formula-cite">
+          <strong>Citation:</strong> Bureau of Public Roads. (1964). <em>Traffic Assignment Manual for Application with a Large, High Speed Computer</em>. U.S. Department of Commerce.
+        </p>
+      </div>
+    </section>
+
+    <!-- Manual Input Controls -->
+    <h2 class="section-heading">Corridor &amp; Signal Parameters (Manual Entry)</h2>
+    <section class="input-grid" aria-label="Parameter Inputs">
+      <div class="field">
+        <label for="length">Distance L (km)</label>
+        <input type="number" id="length" value="0.60" step="0.05" min="0.05" />
+      </div>
+      <div class="field">
+        <label for="speed">Free-Flow Speed v<sub>0</sub> (km/h)</label>
+        <input type="number" id="speed" value="40" step="1" min="5" />
+      </div>
+      <div class="field">
+        <label for="lanes">Active Lanes N (min 1)</label>
+        <input type="number" id="lanes" value="3" step="1" min="1" />
+      </div>
+      <div class="field">
+        <label for="satFlow">Saturation Flow s (PCU/hr/ln)</label>
+        <input type="number" id="satFlow" value="1800" step="50" min="100" />
+      </div>
+      <div class="field">
+        <label for="greenTime">Effective Green g (sec)</label>
+        <input type="number" id="greenTime" value="50" step="1" min="1" />
+      </div>
+      <div class="field">
+        <label for="cycleLength">Cycle Length C (sec)</label>
+        <input type="number" id="cycleLength" value="120" step="5" min="10" />
+      </div>
+      <div class="field">
+        <label for="volume">Traffic Volume v (PCU/hr)</label>
+        <input type="number" id="volume" value="3000" step="100" min="0" />
+      </div>
+      <div class="field">
+        <label for="alpha">BPR Alpha (&alpha;)</label>
+        <input type="number" id="alpha" value="0.15" step="0.05" min="0.01" />
+      </div>
+      <div class="field">
+        <label for="beta">BPR Beta (&beta;)</label>
+        <input type="number" id="beta" value="4.0" step="0.1" min="1" />
+      </div>
+    </section>
+
+    <!-- Calculated Results -->
+    <h2 class="section-heading">Computed Corridor Performance</h2>
+    <section class="kpi-grid" aria-label="Calculated Outputs">
+      <div class="kpi-card">
+        <div class="kpi-label">Free-Flow Time (t<sub>0</sub>)</div>
+        <div class="kpi-value" id="outT0">0.90 min</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Capacity (c)</div>
+        <div class="kpi-value" id="outCap">2,250 PCU/hr</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">v / c Ratio</div>
+        <div class="kpi-value" id="outVC">1.33</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Time (t)</div>
+        <div class="kpi-value" id="outT">1.33 min</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Delay (d = t &minus; t<sub>0</sub>)</div>
+        <div class="kpi-value" id="outDelay">0.43 min (25.6 s)</div>
+      </div>
+    </section>
+
+    <!-- Monochrome Sensitivity Graph -->
+    <section class="chart-box" aria-label="Sensitivity Graph">
+      <div class="chart-header">
+        <h2 class="section-heading" style="margin-bottom:0;">Delay Sensitivity vs. Traffic Volume (v)</h2>
+        <div class="legend">
+          <span class="legend-item"><span class="line-solid"></span> Selected &alpha;</span>
